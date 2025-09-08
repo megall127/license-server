@@ -7,11 +7,11 @@ const dbConfig = defineConfig({
     mysql: {
       client: 'mysql2',
       connection: {
-        host: process.env.MYSQLHOST || env.get('DB_HOST'),
-        port: process.env.MYSQLPORT ? Number(process.env.MYSQLPORT) : Number(env.get('DB_PORT')),
-        user: process.env.MYSQLUSER || env.get('DB_USER'),
-        password: process.env.MYSQLPASSWORD || env.get('DB_PASSWORD'),
-        database: process.env.MYSQLDATABASE || env.get('DB_DATABASE'),
+        host: process.env.MYSQLHOST || env.get('MYSQLHOST'),
+        port: process.env.MYSQLPORT ? Number(process.env.MYSQLPORT) : Number(env.get('MYSQLPORT')),
+        user: process.env.MYSQLUSER || env.get('MYSQLUSER'),
+        password: process.env.MYSQLPASSWORD || env.get('MYSQLPASSWORD'),
+        database: process.env.MYSQLDATABASE || env.get('MYSQLDATABASE'),
       },
       migrations: {
         naturalSort: true,
