@@ -4,7 +4,7 @@
 
 ### 1. Variáveis de Ambiente no Railway
 
-Configure as seguintes variáveis de ambiente no painel do Railway:
+**IMPORTANTE**: O Railway já fornece automaticamente as variáveis do MySQL. Você só precisa adicionar:
 
 ```
 NODE_ENV=production
@@ -12,14 +12,24 @@ PORT=3000
 APP_KEY=your-secret-app-key-here
 HOST=0.0.0.0
 LOG_LEVEL=info
-
-# Database (use as credenciais do seu banco MySQL no Railway)
-DB_HOST=your-db-host
-DB_PORT=3306
-DB_USER=your-db-user
-DB_PASSWORD=your-db-password
-DB_DATABASE=your-db-name
 ```
+
+**Configuração do Banco de Dados:**
+
+O sistema agora suporta **duas formas** de conexão:
+
+1. **Via URL (Recomendado para Railway):**
+   - Use a variável `MYSQL_URL` que o Railway fornece automaticamente
+   - Formato: `mysql://user:password@host:port/database`
+
+2. **Via variáveis individuais (Fallback):**
+   - `MYSQLHOST` → `DB_HOST`
+   - `MYSQLPORT` → `DB_PORT` 
+   - `MYSQLUSER` → `DB_USER`
+   - `MYSQLPASSWORD` → `DB_PASSWORD`
+   - `MYSQLDATABASE` → `DB_DATABASE`
+
+**A URL do Railway é automaticamente detectada e usada!**
 
 ### 2. Comandos de Build
 
