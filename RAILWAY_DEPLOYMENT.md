@@ -4,7 +4,7 @@
 
 ### 1. Variáveis de Ambiente no Railway
 
-**IMPORTANTE**: O Railway já fornece automaticamente as variáveis do MySQL. Você só precisa adicionar:
+**IMPORTANTE**: Configure estas variáveis no Railway:
 
 ```
 NODE_ENV=production
@@ -12,6 +12,11 @@ PORT=3000
 APP_KEY=your-secret-app-key-here
 HOST=0.0.0.0
 LOG_LEVEL=info
+```
+
+**Para gerar APP_KEY:**
+```bash
+node ace generate:key
 ```
 
 **Configuração do Banco de Dados:**

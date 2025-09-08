@@ -15,6 +15,23 @@ router.get('/api', ({ response }) => {
   })
 })
 
+// Rota de teste com informações do sistema
+router.get('/api/test', ({ response }) => {
+  return response.json({
+    status: 'ok',
+    message: 'API test endpoint',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    port: process.env.PORT,
+    database: {
+      host: process.env.MYSQLHOST || 'not set',
+      port: process.env.MYSQLPORT || 'not set',
+      user: process.env.MYSQLUSER || 'not set',
+      database: process.env.MYSQLDATABASE || 'not set'
+    }
+  })
+})
+
 // Agrupamento de rotas de autenticação (usuários)
 router.group(() => {
   router.post('/register', [UsersController, 'create'])
