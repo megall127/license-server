@@ -43,4 +43,13 @@ Se ainda houver erro `MODULE_NOT_FOUND`:
 
 ### 5. Health Check
 
-A aplicação responde em `/api` para health checks.
+A aplicação agora tem uma rota de health check em `/api` que retorna:
+```json
+{
+  "status": "ok",
+  "message": "API is running",
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
+
+Esta rota é usada pelo Railway para verificar se a aplicação está funcionando corretamente.

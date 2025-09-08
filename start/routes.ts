@@ -6,6 +6,15 @@ import UsersController from '#controllers/users_controller'
 import CashFlowController from '#controllers/cash_flow_controller'
 import router from '@adonisjs/core/services/router'
 
+// Rota de health check para o Railway
+router.get('/api', ({ response }) => {
+  return response.json({ 
+    status: 'ok', 
+    message: 'API is running',
+    timestamp: new Date().toISOString()
+  })
+})
+
 // Agrupamento de rotas de autenticação (usuários)
 router.group(() => {
   router.post('/register', [UsersController, 'create'])
