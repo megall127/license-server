@@ -4,9 +4,6 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from './user.js'
 
 export default class Company extends BaseModel {
-  findBy(arg0: string, arg1: any) {
-      throw new Error('Method not implemented.')
-  }
   @column({ isPrimary: true })
   declare id: number
 
