@@ -4,6 +4,8 @@ import ProductsController from '#controllers/products_controller'
 import TypesProdServicesController from '#controllers/types_prod_services_controller'
 import UsersController from '#controllers/users_controller'
 import CashFlowController from '#controllers/cash_flow_controller'
+import EmployeesController from '#controllers/employees_controller'
+import SchedulesController from '#controllers/schedules_controller'
 import router from '@adonisjs/core/services/router'
 
 // Rota de health check para o Railway
@@ -57,8 +59,26 @@ router.group(() => {
 
   // Novas rotas para fluxo de caixa
   router.post('/cash-flow/transaction', [CashFlowController, 'createTransaction'])
+  router.post('/cash-flow/entry', [CashFlowController, 'cashEntry'])
   router.get('/cash-flow/transactions/:id', [CashFlowController, 'getTransactions'])
   router.get('/cash-flow/summary/:id', [CashFlowController, 'getCashFlowSummary'])
   router.put('/cash-flow/transaction/:id/cancel', [CashFlowController, 'cancelTransaction'])
+
+  // Rotas para funcionários
+  router.get('/employees', [EmployeesController, 'index'])
+  router.get('/employees/company/:companyId', [EmployeesController, 'getByCompany'])
+  router.get('/employees/:id', [EmployeesController, 'show'])
+  router.post('/employees', [EmployeesController, 'store'])
+  router.put('/employees/:id', [EmployeesController, 'update'])
+  router.delete('/employees/:id', [EmployeesController, 'destroy'])
+
+  // Rotas para agendamentos
+  router.get('/schedules', [SchedulesController, 'index'])
+  router.get('/schedules/company/:companyId', [SchedulesController, 'getByCompany'])
+  router.get('/schedules/company/:companyId/range', [SchedulesController, 'getByDateRange'])
+  router.get('/schedules/:id', [SchedulesController, 'show'])
+  router.post('/schedules', [SchedulesController, 'store'])
+  router.put('/schedules/:id', [SchedulesController, 'update'])
+  router.delete('/schedules/:id', [SchedulesController, 'destroy'])
 
 }).prefix('api')

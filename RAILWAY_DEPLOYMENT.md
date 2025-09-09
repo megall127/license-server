@@ -19,6 +19,22 @@ LOG_LEVEL=info
 node ace generate:key
 ```
 
+**Para desenvolvimento local, crie um arquivo `.env`:**
+```
+NODE_ENV=development
+PORT=3333
+APP_KEY=your-app-key-here
+HOST=localhost
+LOG_LEVEL=info
+
+# Database local
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_DATABASE=license_db
+```
+
 **Configuração do Banco de Dados:**
 
 O sistema agora suporta **duas formas** de conexão:

@@ -27,6 +27,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   MYSQLHOST: Env.schema.string({ format: 'host' }),
   MYSQLPORT: Env.schema.number(),
   MYSQLUSER: Env.schema.string(),
-  MYSQLPASSWORD: Env.schema.string(),
+  MYSQLPASSWORD: Env.schema.string.optional(),
   MYSQLDATABASE: Env.schema.string()
 })

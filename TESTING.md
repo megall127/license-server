@@ -66,6 +66,40 @@ Content-Type: application/json
 GET /api/get-all-company
 ```
 
+### 6. Entrada de Dinheiro no Caixa (Venda) - ÚNICA FUNCIONALIDADE
+```
+POST /api/cash-flow/entry
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "companyId": 1,
+  "amount": 25.50,
+  "quantity": 1,
+  "description": "Venda de produto",
+  "paymentMethod": "dinheiro",
+  "customerName": "João Silva",
+  "customerDocument": "123.456.789-00"
+}
+```
+
+**Resposta esperada:**
+```json
+{
+  "message": "Entrada de dinheiro registrada com sucesso",
+  "transaction": {
+    "id": 1,
+    "transactionType": "entrada",
+    "amount": 25.50,
+    "quantity": 1,
+    "status": "confirmado",
+    "product": { "name": "Produto", "amount": 9 },
+    "company": { "name": "Empresa" }
+  },
+  "newStock": 9
+}
+```
+
 ## 🛠️ Ferramentas para Testar
 
 ### Postman/Insomnia

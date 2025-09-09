@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import User from './user.js'
 
 export default class Company extends BaseModel {
@@ -41,7 +41,14 @@ export default class Company extends BaseModel {
   declare userId: number
 
   @belongsTo(() => User)
+  @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
+
+  @hasMany(() => {
+    const { default: Employee } = require('./employee.js')
+    return Employee
+  })
+  declare employeeList: HasMany<typeof import('./employee.js').default>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

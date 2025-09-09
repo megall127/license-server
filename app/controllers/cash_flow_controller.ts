@@ -47,8 +47,8 @@ export default class CashFlowController {
         return response.status(404).json({ error: 'Empresa não encontrada' })
       }
 
-      // Se for uma saída, verificar se há estoque suficiente
-      if (transactionType === 'saida' && product.amount < quantity) {
+      // Verificar se há estoque suficiente (apenas para vendas)
+      if (product.amount < quantity) {
         return response.status(400).json({ 
           error: 'Estoque insuficiente',
           available: product.amount,
@@ -71,22 +71,14 @@ export default class CashFlowController {
 
       await transaction.save()
 
-      // Atualizar estoque do produto
-      if (transactionType === 'entrada') {
-        product.amount += quantity
-      } else {
-        product.amount -= quantity
-      }
+      // Atualizar estoque do produto (apenas diminui para vendas)
+      product.amount -= quantity
       await product.save()
 
-      // Atualizar valores da empresa
-      if (transactionType === 'entrada') {
-        company.dayValue += amount
-        company.monthValue += amount
-        company.anualValue += amount
-      } else {
-        company.leaveValue += amount
-      }
+      // Atualizar valores da empresa (apenas entrada de dinheiro)
+      company.dayValue += amount
+      company.monthValue += amount
+      company.anualValue += amount
       await company.save()
 
       // Buscar a transação com relacionamentos
@@ -187,16 +179,12 @@ export default class CashFlowController {
           .whereBetween('createdAt', [startSQL, endSQL])
           .where('status', 'confirmado')
 
-        // Calcular totais
+        // Calcular totais (apenas entradas)
         const totalEntradas = transactions
           .filter(t => t.transactionType === 'entrada')
           .reduce((sum, t) => sum + Number(t.amount), 0)
 
-        const totalSaidas = transactions
-          .filter(t => t.transactionType === 'saida')
-          .reduce((sum, t) => sum + Number(t.amount), 0)
-
-        const saldo = totalEntradas - totalSaidas
+        const saldo = totalEntradas
 
         // Agrupar por método de pagamento
         const paymentMethods: Record<string, number> = transactions.reduce((acc, t) => {
@@ -209,7 +197,7 @@ export default class CashFlowController {
         // Top produtos mais vendidos
         const topProducts = await TransitionsBuySells.query()
           .where('companyId', companyId)
-          .where('transactionType', 'saida')
+          .where('transactionType', 'entrada')
           .whereBetween('createdAt', [startSQL, endSQL])
           .preload('product')
           .groupBy('productId')
@@ -224,7 +212,6 @@ export default class CashFlowController {
           endDate: endDate.toISO(),
           summary: {
             totalEntradas,
-            totalSaidas,
             saldo,
             totalTransactions: transactions.length
           },
@@ -239,7 +226,6 @@ export default class CashFlowController {
         endDate: endDate.toISO(),
         summary: {
           totalEntradas: 0,
-          totalSaidas: 0,
           saldo: 0,
           totalTransactions: 0
         },
@@ -249,6 +235,99 @@ export default class CashFlowController {
 
     } catch (error) {
       console.error('Erro ao buscar resumo:', error)
+      return response.status(500).json({ error: 'Erro interno do servidor' })
+    }
+  }
+
+  // Entrada de dinheiro no caixa (venda) - diminui estoque automaticamente
+  public async cashEntry({ request, response, auth }: HttpContext) {
+    try {
+      const check = await auth.use('api').authenticate()
+      if (!check) {
+        return response.status(401).json({ error: 'Usuário não autenticado' })
+      }
+
+      const {
+        productId,
+        companyId,
+        amount,
+        quantity = 1, // Por padrão, vende 1 unidade
+        description,
+        paymentMethod = 'dinheiro',
+        customerName,
+        customerDocument
+      } = request.only([
+        'productId',
+        'companyId',
+        'amount',
+        'quantity',
+        'description',
+        'paymentMethod',
+        'customerName',
+        'customerDocument'
+      ])
+
+      // Validar se o produto existe
+      const product = await Product.find(productId)
+      if (!product) {
+        return response.status(404).json({ error: 'Produto não encontrado' })
+      }
+
+      // Validar se a empresa existe
+      const company = await Company.find(companyId)
+      if (!company) {
+        return response.status(404).json({ error: 'Empresa não encontrada' })
+      }
+
+      // Verificar se há estoque suficiente
+      if (product.amount < quantity) {
+        return response.status(400).json({ 
+          error: 'Estoque insuficiente',
+          available: product.amount,
+          requested: quantity
+        })
+      }
+
+      // Criar a transação de entrada (venda)
+      const transaction = new TransitionsBuySells()
+      transaction.productId = productId
+      transaction.companyId = companyId
+      transaction.transactionType = 'entrada' // Entrada de dinheiro
+      transaction.amount = amount
+      transaction.quantity = quantity
+      transaction.description = description || `Venda de ${product.name}`
+      transaction.paymentMethod = paymentMethod
+      transaction.customerName = customerName
+      transaction.customerDocument = customerDocument
+      transaction.status = 'confirmado'
+
+      await transaction.save()
+
+      // Diminuir estoque do produto
+      product.amount -= quantity
+      await product.save()
+
+      // Aumentar valores da empresa (entrada de dinheiro)
+      company.dayValue += amount
+      company.monthValue += amount
+      company.anualValue += amount
+      await company.save()
+
+      // Buscar a transação com relacionamentos
+      const transactionWithRelations = await TransitionsBuySells.query()
+        .where('id', transaction.id)
+        .preload('product')
+        .preload('company')
+        .first()
+
+      return response.json({
+        message: 'Entrada de dinheiro registrada com sucesso',
+        transaction: transactionWithRelations,
+        newStock: product.amount
+      })
+
+    } catch (error) {
+      console.error('Erro ao registrar entrada de dinheiro:', error)
       return response.status(500).json({ error: 'Erro interno do servidor' })
     }
   }
@@ -272,27 +351,19 @@ export default class CashFlowController {
         return response.status(400).json({ error: 'Transação já está cancelada' })
       }
 
-      // Reverter estoque
+      // Reverter estoque (apenas para entradas/vendas)
       const product = await Product.find(transaction.productId)
-      if (product) {
-        if (transaction.transactionType === 'entrada') {
-          product.amount -= transaction.quantity
-        } else {
-          product.amount += transaction.quantity
-        }
+      if (product && transaction.transactionType === 'entrada') {
+        product.amount += transaction.quantity
         await product.save()
       }
 
-      // Reverter valores da empresa
+      // Reverter valores da empresa (apenas para entradas/vendas)
       const company = await Company.find(transaction.companyId)
-      if (company) {
-        if (transaction.transactionType === 'entrada') {
-          company.dayValue -= transaction.amount
-          company.monthValue -= transaction.amount
-          company.anualValue -= transaction.amount
-        } else {
-          company.leaveValue -= transaction.amount
-        }
+      if (company && transaction.transactionType === 'entrada') {
+        company.dayValue -= transaction.amount
+        company.monthValue -= transaction.amount
+        company.anualValue -= transaction.amount
         await company.save()
       }
 
