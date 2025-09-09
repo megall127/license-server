@@ -6,6 +6,7 @@ import UsersController from '#controllers/users_controller'
 import CashFlowController from '#controllers/cash_flow_controller'
 import EmployeesController from '#controllers/employees_controller'
 import SchedulesController from '#controllers/schedules_controller'
+import CustomersController from '#controllers/customers_controller'
 import router from '@adonisjs/core/services/router'
 
 // Rota de health check para o Railway
@@ -80,5 +81,13 @@ router.group(() => {
   router.post('/schedules', [SchedulesController, 'store'])
   router.put('/schedules/:id', [SchedulesController, 'update'])
   router.delete('/schedules/:id', [SchedulesController, 'destroy'])
+
+  // Rotas para clientes
+  router.get('/customers', [CustomersController, 'index'])
+  router.get('/customers/company/:companyId', [CustomersController, 'getByCompany'])
+  router.get('/customers/:id', [CustomersController, 'show'])
+  router.post('/customers', [CustomersController, 'store'])
+  router.put('/customers/:id', [CustomersController, 'update'])
+  router.delete('/customers/:id', [CustomersController, 'destroy'])
 
 }).prefix('api')

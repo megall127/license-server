@@ -9,7 +9,6 @@ export default class EmployeesController {
   async index({ response }: HttpContext) {
     try {
       const employees = await Employee.query()
-        .preload('company')
         .orderBy('created_at', 'desc')
 
       return response.ok({
@@ -35,7 +34,6 @@ export default class EmployeesController {
 
       const employees = await Employee.query()
         .where('company_id', companyId)
-        .preload('company')
         .orderBy('created_at', 'desc')
 
       return response.ok({
@@ -61,7 +59,6 @@ export default class EmployeesController {
 
       const employee = await Employee.query()
         .where('id', id)
-        .preload('company')
         .first()
 
       if (!employee) {
@@ -101,6 +98,16 @@ export default class EmployeesController {
         'status'
       ])
 
+      console.log('Dados recebidos para criar funcionário:', data)
+
+      // Validar campos obrigatórios
+      if (!data.name || !data.email || !data.position || !data.companyId) {
+        return response.badRequest({
+          success: false,
+          message: 'Nome, email, posição e ID da empresa são obrigatórios'
+        })
+      }
+
       // Validar se a empresa existe
       const company = await Company.find(data.companyId)
       if (!company) {
@@ -119,6 +126,20 @@ export default class EmployeesController {
         })
       }
 
+      console.log('Empresa encontrada:', company)
+      console.log('Email não existe, prosseguindo com criação...')
+
+      console.log('Tentando criar funcionário com dados:', {
+        name: data.name,
+        email: data.email,
+        phone: data.phone || null,
+        position: data.position,
+        companyId: data.companyId,
+        salary: data.salary || 0,
+        hireDate: data.hireDate || null,
+        status: data.status || 'ativo'
+      })
+
       const employee = await Employee.create({
         name: data.name,
         email: data.email,
@@ -130,7 +151,9 @@ export default class EmployeesController {
         status: data.status || 'ativo'
       })
 
-      await employee.load('company')
+      console.log('Funcionário criado com sucesso:', employee)
+
+      // await employee.load('company') // Relacionamento temporariamente removido
 
       return response.created({
         success: true,
@@ -138,10 +161,12 @@ export default class EmployeesController {
         message: 'Funcionário criado com sucesso'
       })
     } catch (error) {
+      console.error('Erro detalhado ao criar funcionário:', error)
       return response.badRequest({
         success: false,
         message: 'Erro ao criar funcionário',
-        error: error.message
+        error: error.message,
+        details: error
       })
     }
   }
@@ -195,7 +220,7 @@ export default class EmployeesController {
 
       employee.merge(data)
       await employee.save()
-      await employee.load('company')
+      // await employee.load('company') // Relacionamento temporariamente removido
 
       return response.ok({
         success: true,

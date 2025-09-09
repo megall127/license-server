@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
-export default class Employee extends BaseModel {
+export default class Customer extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
@@ -9,25 +9,16 @@ export default class Employee extends BaseModel {
   declare name: string
 
   @column()
-  declare email: string
+  declare email: string | null
 
   @column()
   declare phone: string | null
 
   @column()
-  declare position: string
+  declare address: string | null
 
   @column({ columnName: 'company_id' })
   declare companyId: number
-
-  @column()
-  declare salary: number
-
-  @column.date({ columnName: 'hire_date' })
-  declare hireDate: DateTime | null
-
-  @column()
-  declare status: 'ativo' | 'inativo'
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
