@@ -25,6 +25,8 @@ export default class Product extends BaseModel {
   @column()
   declare minAmount: number | null
 
+  @column()
+  declare stockEnabled: boolean
 
   @column()
   declare valueCoast: number | null

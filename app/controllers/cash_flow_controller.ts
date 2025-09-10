@@ -47,8 +47,8 @@ export default class CashFlowController {
         return response.status(404).json({ error: 'Empresa não encontrada' })
       }
 
-      // Verificar se há estoque suficiente (apenas para vendas)
-      if (product.amount < quantity) {
+      // Verificar se há estoque suficiente (apenas para produtos com controle de estoque ativado)
+      if (product.stockEnabled && product.amount < quantity) {
         return response.status(400).json({ 
           error: 'Estoque insuficiente',
           available: product.amount,
@@ -279,8 +279,8 @@ export default class CashFlowController {
         return response.status(404).json({ error: 'Empresa não encontrada' })
       }
 
-      // Verificar se há estoque suficiente
-      if (product.amount < quantity) {
+      // Verificar se há estoque suficiente (apenas para produtos com controle de estoque ativado)
+      if (product.stockEnabled && product.amount < quantity) {
         return response.status(400).json({ 
           error: 'Estoque insuficiente',
           available: product.amount,

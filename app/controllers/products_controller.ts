@@ -39,6 +39,7 @@ export default class ProductsController {
             product.type = request.input('type');
             product.amount = request.input('amount') || 0;
             product.minAmount = request.input('minAmount') || 0;
+            product.stockEnabled = request.input('stockEnabled') || false;
             product.valueCoast = request.input('valueCoast') || 0;
             product.supplier = request.input('supplier') || '';
             product.internalCod = request.input('internalCod') || '';
@@ -168,6 +169,7 @@ export default class ProductsController {
             product.type = request.input('type', product.type);
             product.amount = request.input('amount', product.amount);
             product.minAmount = request.input('minAmount', product.minAmount);
+            product.stockEnabled = request.input('stockEnabled', product.stockEnabled);
             product.valueCoast = request.input('valueCoast', product.valueCoast);
             product.supplier = request.input('supplier', product.supplier);
             product.internalCod = request.input('internalCod', product.internalCod);
