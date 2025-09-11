@@ -7,6 +7,7 @@ import CashFlowController from '#controllers/cash_flow_controller'
 import EmployeesController from '#controllers/employees_controller'
 import SchedulesController from '#controllers/schedules_controller'
 import CustomersController from '#controllers/customers_controller'
+import AiChatController from '#controllers/ai_chat_controller'
 import router from '@adonisjs/core/services/router'
 
 // Rota de health check para o Railway
@@ -89,5 +90,9 @@ router.group(() => {
   router.post('/customers', [CustomersController, 'store'])
   router.put('/customers/:id', [CustomersController, 'update'])
   router.delete('/customers/:id', [CustomersController, 'destroy'])
+
+  // Rotas para chat de IA
+  router.post('/ai-chat', [AiChatController, 'chat'])
+  router.get('/ai-chat/suggestions', [AiChatController, 'getSuggestions'])
 
 }).prefix('api')

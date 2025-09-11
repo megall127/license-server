@@ -28,5 +28,12 @@ export default await Env.create(new URL('../', import.meta.url), {
   MYSQLPORT: Env.schema.number(),
   MYSQLUSER: Env.schema.string(),
   MYSQLPASSWORD: Env.schema.string.optional(),
-  MYSQLDATABASE: Env.schema.string()
+  MYSQLDATABASE: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for AI Chat integration
+  |----------------------------------------------------------
+  */
+  OPENAI_API_KEY: Env.schema.string.optional()
 })
